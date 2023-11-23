@@ -1,0 +1,1 @@
+chmod +x Documents/panda/monitoring\ tools/Panda\ Script\ Run\ Once/PandaScriptRunOnce.exe
