@@ -243,4 +243,233 @@ class login_c extends CI_Controller
             redirect('#');
         }
     }
+
+    public function customer_setsession()
+    {
+        if ($this->session->userdata('loginuser') == true) {
+            // echo '123';
+            $customer_guid = $this->input->post('customer');
+            // new added for reminder
+            $blocked_guid = $this->input->post('blocked_guid');
+            if ($blocked_guid != '') {
+                $blocked_guid = explode(",", $blocked_guid);
+                $blocked_guid = implode("','", $blocked_guid);
+                $blocked_guid = "'" . $blocked_guid . "'";
+                $query_blocked = "AND b.supplier_guid NOT IN ($blocked_guid)";
+            }
+            else
+            {
+                $query_blocked = '';
+            }
+
+            $query_set_user_group = $this->db->query("SELECT b.user_group_name 
+            FROM lite_b2b.set_user a 
+            INNER JOIN lite_b2b.set_user_group b 
+            ON a.user_group_guid = b.user_group_guid 
+            WHERE a.user_id = '" . $_SESSION['userid'] . "'
+            AND a.acc_guid = '$customer_guid'")->row('user_group_name');
+
+            // echo $query_blocked; echo '<br>'; 
+            // echo $customer_guid;die;
+            // $get_loc = $this->db->query("SELECT distinct branch_code, branch_name from  set_user as a inner join  acc_branch as b on a.branch_guid = b.branch_guid where user_id = '".$_SESSION['userid']."' and a.isactive = '1' and module_group_guid = '".$_SESSION['module_group_guid']."' order by branch_code asc");
+            $get_loc = $this->db->query("SELECT distinct c.branch_code, c.branch_name from set_user a inner join set_user_branch b ON a.user_guid = b.user_guid inner join acc_branch c on b.branch_guid = c.branch_guid where a.user_id = '" . $_SESSION['userid'] . "' and a.isactive = '1' and a.module_group_guid = '" . $_SESSION['module_group_guid'] . "' and b.acc_guid = '$customer_guid' AND c.isactive = '1' order by branch_code asc");
+            //echo $this->db->last_query();die; 
+
+            // echo var_dump($get_loc->result()); die;
+            $hq_branch_code = $this->db->query("SELECT branch_code FROM acc_branch WHERE is_hq = '1'")->result();
+
+            $hq_branch_code_array = array();
+
+            foreach ($hq_branch_code as $key) {
+
+                array_push($hq_branch_code_array, $key->branch_code);
+            }
+
+            foreach ($get_loc->result() as  $row) {
+                $check_HQ[] = $row->branch_code;
+            }
+
+            if (!array_diff($hq_branch_code_array, $check_HQ)) {
+
+                $sessiondata = array(
+                    'isHQ' => '1',
+                );
+                $this->session->set_userdata($sessiondata);
+            } else {
+                $sessiondata = array(
+                    'isHQ' => '0',
+                );
+                $this->session->set_userdata($sessiondata);
+            }
+
+            $sessiondata = array(
+                'customer_guid' => $this->input->post('customer'),
+                /*'customer' => $this->db->query("SELECT acc where")*/
+                'show_side_menu' => '1',
+            );
+            $this->session->set_userdata($sessiondata);
+
+
+            foreach ($check_HQ as &$value) {
+                $value = "'" . trim($value) . "'";
+            }
+            $query_loc = implode(',', array_filter($check_HQ));
+            $sessiondata = array(
+                'query_loc' => $query_loc,
+            );
+            $this->session->set_userdata($sessiondata);
+
+
+            $userid = $_SESSION['userid'];
+            $password = $_SESSION['userpass'];
+            $result = $this->login_model->check_module($userid, $password);
+
+            // echo $this->db->last_query();die;
+
+            foreach ($result->result() as $row) {
+                $module_code[] = $row->module_code;
+            }
+
+            $_SESSION['module_code'] = $module_code;
+            // print_r($module_code);die;
+            if (in_array("C1MS", $module_code)) {
+                $_SESSION['system_admin'] = 1;
+            } else {
+                $_SESSION['system_admin'] = 0;
+            }
+            //@@@@@@@@@@@@@@@@@ end module_name session @@@@@@@@@@@@@@@@@@@@@@@   
+            /* echo var_dump($_SESSION['module_code']);
+            die;*/
+
+            $acc_table = $this->db->query("SELECT * FROM acc WHERE acc_guid = '$customer_guid' AND isactive = 1 ");
+
+            $session_data = array(
+                'idle_time' => $acc_table->row('idle_time'),
+            );
+
+            // new add checking user group 11-08-2023
+            // if (!in_array('IAVA', $_SESSION['module_code'])) 
+            // {
+                $sessiondata = array(
+                    'user_group_name' => $query_set_user_group,
+                );
+                $this->session->set_userdata($sessiondata);
+            // }
+
+            if (!in_array('IAVA', $_SESSION['module_code'])) {
+                $query_supcode = $this->db->query("SELECT distinct backend_supplier_code from set_supplier_user_relationship as a inner join set_supplier_group as b on a.supplier_group_guid = b.supplier_group_guid $query_blocked INNER JOIN set_supplier c ON a.supplier_guid = c.supplier_guid where a.user_guid = '" . $_SESSION['user_guid'] . "' AND b.customer_guid = '" . $_SESSION['customer_guid'] . "' AND c.isactive = 1");
+
+                if ($query_supcode->num_rows() == 0) {
+                    echo '<script>alert("Company inactive, Please contact our support!");window.location.href = "' . site_url('login_c/customer') . '";</script>;';
+                    die;
+                    // window.location.href = "http://www.w3schools.com";
+                    // redirect(site_url('login_c/customer'));
+                }
+            } else {
+                $query_supcode = $this->db->query("SELECT distinct backend_supplier_code from set_supplier_user_relationship as a inner join set_supplier_group as b on a.supplier_group_guid = b.supplier_group_guid $query_blocked where a.user_guid = '" . $_SESSION['user_guid'] . "' AND b.customer_guid = '" . $_SESSION['customer_guid'] . "'");
+            }
+            //echo $this->db->last_query(); die;
+            // $query_supcode = $this->db->query("SELECT distinct backend_supplier_code from set_supplier_user_relationship as a inner join set_supplier_group as b on a.supplier_group_guid = b.supplier_group_guid where a.user_guid = '".$_SESSION['user_guid']."'");
+
+            if (!in_array('IAVA', $_SESSION['module_code'])) {
+                $query_consign_supcode = $this->db->query("SELECT distinct backend_supplier_code from set_supplier_user_relationship as a inner join set_supplier_group as b on a.supplier_group_guid = b.supplier_group_guid $query_blocked inner join b2b_summary.supcus c on b.backend_supcus_guid = c.supcus_guid INNER JOIN lite_b2b.set_supplier c ON a.supplier_guid = c.supplier_guid where a.user_guid = '" . $_SESSION['user_guid'] . "' and b.customer_guid = '" . $_SESSION['customer_guid'] . "' and c.consign = 1 and c.isactive = 1");
+            } else {
+                $query_consign_supcode = $this->db->query("SELECT distinct backend_supplier_code from set_supplier_user_relationship as a inner join set_supplier_group as b on a.supplier_group_guid = b.supplier_group_guid $query_blocked inner join b2b_summary.supcus c on b.backend_supcus_guid = c.supcus_guid where a.user_guid = '" . $_SESSION['user_guid'] . "' and c.consign = 1 AND b.customer_guid = '" . $_SESSION['customer_guid'] . "' ");
+            }
+            //echo $this->db->last_query();die;
+            // print_r($query_consign_supcode->result());die;
+            // $query_consign_supcode = $this->db->query("SELECT distinct backend_supplier_code from set_supplier_user_relationship as a inner join set_supplier_group as b on a.supplier_group_guid = b.supplier_group_guid inner join b2b_summary.supcus c on b.backend_supcus_guid = c.supcus_guid where a.user_guid = '".$_SESSION['user_guid']."' and c.consign = 1");
+
+            /* $get_loc = $this->db->query("SELECT distinct branch_code, branch_name from  set_user as a inner join  acc_branch as b on a.branch_guid = b.branch_guid where user_id = '".$_SESSION['userid']."' and user_password = '".$_SESSION['userpass']."' and a.isactive = '1' and module_group_guid = '".$_SESSION['module_group_guid']."' order by branch_code asc");
+            */
+            // echo $this->db->last_query();
+            $check_supcode = array();
+            foreach ($query_supcode->result() as  $row) {
+                $check_supcode[] = $row->backend_supplier_code;
+            }
+            // print_r($check_supcode);die;
+            $check_supcode_without_quote =  $check_supcode;
+            foreach ($check_supcode as &$value) {
+                $value = "'" . trim($value) . "'";
+            }
+            $query_supcode = implode(',', array_filter($check_supcode));
+
+            $check_consign_supcode = array();
+            foreach ($query_consign_supcode->result() as  $row2) {
+                $check_consign_supcode[] = $row2->backend_supplier_code;
+            }
+            // print_r($check_supcode);die;
+
+            foreach ($check_consign_supcode as &$value) {
+                $value = "'" . trim($value) . "'";
+            }
+            $query_consign_supcode = implode(',', array_filter($check_consign_supcode));
+
+            $other_doc = $this->db->query("SELECT * FROM other_doc_setting WHERE customer_guid = '$customer_guid' AND isactive = 1 ORDER BY seq ASC");
+            $check_user_group = $this->db->query("SELECT * FROM set_user WHERE acc_guid = '$customer_guid' AND user_guid = '" . $_SESSION['user_guid'] . "' LIMIT 1");
+            $sessiondata = array(
+                'query_supcode' => $query_supcode,
+                'query_consign_supcode' => $query_consign_supcode,
+                'other_doc' => $other_doc->result(),
+                'check_supcode_without_quote' => $check_supcode_without_quote,
+                'user_group_guid' => $check_user_group->row('user_group_guid'),
+                'query_blocked' => $blocked_guid,
+            );
+            $this->session->set_userdata($sessiondata);
+
+            //print_r($sessiondata); die;
+
+            $userid = $_SESSION['userid'];
+            $password = $_SESSION['userpass'];
+            $result = $this->login_model->check_module($userid, $password);
+            //@@@@@@@@@@@@@@@@@@@@@@ module_name session @@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            // echo $this->db->last_query();die;
+
+            // $check_acc_user = $this->login_model->check_module($userid, $password);
+            // if($check_acc_user->row('module_code') == 'C1MS')
+            // {
+            //     $_SESSION['system_admin'] = 1;
+            //    // redirect("Acc_master_setup");
+            // }
+            // else
+            // {
+            //     $_SESSION['system_admin'] = 0;
+            //    // redirect("Module_setup");
+            // }
+
+            foreach ($result->result() as $row) {
+                $module_code[] = $row->module_code;
+            }
+
+            $_SESSION['module_code'] = $module_code;
+            //print_r($module_code);die;
+            if (in_array("C1MS", $module_code)) {
+                $_SESSION['system_admin'] = 1;
+            } else {
+                $_SESSION['system_admin'] = 0;
+            }
+            //@@@@@@@@@@@@@@@@@ end module_name session @@@@@@@@@@@@@@@@@@@@@@@   
+            /* echo var_dump($_SESSION['module_code']);
+                    die;*/
+            $redirect = '';
+            $this->panda->get_uri();
+            if (in_array('DASH', $_SESSION['module_code'])) {
+                //redirect('dashboard');
+                $redirect = 'dashboard';
+            } else {
+                //redirect('panda_home');
+                $redirect = 'panda_home';
+            };
+
+            $data = array(
+                //'module_code' => $module_code,
+                'para' => '1',
+                'redirect' => $redirect,
+
+            );
+            echo json_encode($data);
+        } else {
+            redirect('#');
+        }
+    }
 }

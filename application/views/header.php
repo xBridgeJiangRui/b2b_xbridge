@@ -89,6 +89,11 @@
     }
   }
 
+  .media:hover {
+    background-color:#007bff;
+    color: black;
+  }
+
   body {
     width: 100%;
     height: 100%;
@@ -336,8 +341,8 @@
 
                   <?php 
                   $name = $this->db->query("SELECT a.acc_name FROM lite_b2b.acc a WHERE a.acc_guid = '" . $_SESSION['customer_guid'] . "'")->row('acc_name'); 
-                  $get_logo_info = $this->db->query("SELECT a.file_path,CONCAT('/asset/',a.file_path) AS concat_file_path from lite_b2b.acc where a.acc_guid = '" . $_SESSION['customer_guid'] . "'"); 
-                  $store_logo = $get_logo_info->row('file_path');
+                  $get_logo_info = $this->db->query("SELECT a.file_path,CONCAT('/asset',a.file_path) AS concat_file_path from lite_b2b.acc a WHERE a.acc_guid = '" . $_SESSION['customer_guid'] . "'"); 
+                  $store_logo = $get_logo_info->row('concat_file_path');
                   $get_pic = substr($store_logo, strrpos($store_logo, '/' )+1);
                   ?>
 
@@ -345,10 +350,10 @@
                 }
                 ?>
                 <div class="media">
-                  <?php if(isset($retailer_logo_path) == '1') 
+                  <?php if(isset($get_logo_info) == '1') 
                   {
                     ?>
-                    <img src="<?php echo base_url($store_logo.'/'.$get_pic.'.jpg');?>" alt="Retailer Avatar" class="img-size-50 img-circle mr-3">
+                    <img src="<?php echo base_url($store_logo.'/'.$get_pic.'.jpg');?>" alt="Retailer Avatar" class="img-size-50 img-square mr-3">
                     <?php
                   }
                   ?>

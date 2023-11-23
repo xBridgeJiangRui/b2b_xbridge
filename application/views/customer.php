@@ -118,28 +118,88 @@
 <!-- /.content-wrapper -->
 
 <script>
-  $(document).ready(function() {
+$(document).ready(function() {
+  $(document).on('click', '#choose_retailer', function() {
+    var acc_guid = $(this).attr('acc_guid');
+    var seq = $(this).attr('seq');
+    var register_guid = (typeof $(this).attr('register_guid') !== "undefined") ? $(this).attr('register_guid') : "";
+    var maintenance = $(this).attr('m_l');
+    var maintenance_date = $(this).attr('m_d');
 
+    var blocked_guid = $('#blocked_guid').val();
+    var redirect_location = '';
 
+    if ((acc_guid == '') || (acc_guid == 'null') || (acc_guid == null)) {
+      alert('Error to Get Customer.Please Contact Support.');
+      return;
+    }
 
-    //disable inspect element
-    // document.onkeydown = function(e) {
-    //   if(event.keyCode == 123) {
-    //      return false;
-    //   }
-    //   if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
-    //      return false;
-    //   }
-    //   if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
-    //      return false;
-    //   }
-    //   if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
-    //      return false;
-    //   }
-    //   if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
-    //      return false;
-    //   }
-    // }
+    if ((blocked_guid == '') || (blocked_guid == 'null') || (blocked_guid == null)) {
+      blocked_guid = '';
+    }
 
+    $.ajax({
+      url: "<?php echo site_url('Login_c/customer_setsession') ?>",
+      method: "POST",
+      data: {
+        customer: acc_guid,
+        blocked_guid: blocked_guid
+      },
+      beforeSend: function() {
+        $('.btn').button('loading');
+      },
+      success: function(data) {
+        json = JSON.parse(data);
+        redirect = json.redirect;
+
+        if (json.para == 1) {
+          //$('.btn').button('reset');
+
+          if ((redirect == '') || (redirect == 'null') || (redirect == null)) {
+            alert('Error to Redirect Dashboard.Please Contact Support.');
+            return;
+          }
+
+          if (redirect == 'dashboard') {
+            redirect_location = "<?= site_url('dashboard'); ?>";
+          }
+
+          if (redirect == 'panda_home') {
+            redirect_location = "<?= site_url('panda_home'); ?>";
+          }
+
+          window.location = redirect_location;
+          //redirect(site_url(redirect));
+
+        } else {
+          //$('.btn').button('reset');
+          setTimeout(function() {
+            location.reload();
+          }, 300);
+        }
+
+      } //close success
+    }); //close ajax 
   });
+
+  //disable inspect element
+  // document.onkeydown = function(e) {
+  //   if(event.keyCode == 123) {
+  //      return false;
+  //   }
+  //   if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+  //      return false;
+  //   }
+  //   if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
+  //      return false;
+  //   }
+  //   if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+  //      return false;
+  //   }
+  //   if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+  //      return false;
+  //   }
+  // }
+
+});
 </script>
