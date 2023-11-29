@@ -898,9 +898,11 @@
     $("#jsGrid1").jsGrid({
         height: "100%",
         width: "100%",
-
+        filtering: true,
         sorting: true,
         paging: true,
+        autoload: true,
+        pageSize: 10, // Number of rows per page
 
         data: db.clients,
 
@@ -912,6 +914,7 @@
             { name: "Married", type: "checkbox", title: "Is Married" }
         ]
     });
+    
   });
 </script>
 </body>

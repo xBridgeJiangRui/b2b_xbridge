@@ -76,7 +76,7 @@
         </div>
       </div>
       <div class="card-body">
-        <span class="append_blocked"></span>
+        <span class="append_loading"></span>
         <div class="row">
         <?php 
           $i = 1;
@@ -96,7 +96,7 @@
             <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 img_wrap">
               <img src="<?php echo $row->logo; ?>" alt="<?php echo $row->acc_name; ?>" class="imagess img-square" style="width:100%">
               <div class="middle">
-                <button class="buttonn img-circle" name="choose_retailer" id="choose_retailer" type="button" acc_guid="<?php echo $row->acc_guid ?>" seq="<?php echo $i ?>" register_guid="<?php echo $row->register_guid ?>" m_l="<?php echo $row->maintenance ?>" m_d="<?php echo $row->maintenance_date ?>" ><?php echo $row->acc_name; ?></button>
+                <button class="buttonn img-circle" name="choose_retailer" id="choose_retailer" type="button" acc_guid="<?php echo $row->acc_guid ?>" seq="<?php echo $i ?>" m_l="<?php echo $row->maintenance ?>" m_d="<?php echo $row->maintenance_date ?>" ><?php echo $row->acc_name; ?></button>
               </div>
             </div>
             
@@ -122,11 +122,8 @@ $(document).ready(function() {
   $(document).on('click', '#choose_retailer', function() {
     var acc_guid = $(this).attr('acc_guid');
     var seq = $(this).attr('seq');
-    var register_guid = (typeof $(this).attr('register_guid') !== "undefined") ? $(this).attr('register_guid') : "";
     var maintenance = $(this).attr('m_l');
     var maintenance_date = $(this).attr('m_d');
-
-    var blocked_guid = $('#blocked_guid').val();
     var redirect_location = '';
 
     if ((acc_guid == '') || (acc_guid == 'null') || (acc_guid == null)) {
@@ -134,19 +131,15 @@ $(document).ready(function() {
       return;
     }
 
-    if ((blocked_guid == '') || (blocked_guid == 'null') || (blocked_guid == null)) {
-      blocked_guid = '';
-    }
-
     $.ajax({
       url: "<?php echo site_url('Login_c/customer_setsession') ?>",
       method: "POST",
       data: {
         customer: acc_guid,
-        blocked_guid: blocked_guid
       },
       beforeSend: function() {
         $('.btn').button('loading');
+        $('.append_loading').html('<div class="se-pre-con"></div>');
       },
       success: function(data) {
         json = JSON.parse(data);
@@ -162,10 +155,6 @@ $(document).ready(function() {
 
           if (redirect == 'dashboard') {
             redirect_location = "<?= site_url('dashboard'); ?>";
-          }
-
-          if (redirect == 'panda_home') {
-            redirect_location = "<?= site_url('panda_home'); ?>";
           }
 
           window.location = redirect_location;
