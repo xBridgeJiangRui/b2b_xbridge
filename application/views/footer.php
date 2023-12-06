@@ -146,6 +146,13 @@
 <!-- ChartJS -->
 <script src="<?php echo base_url('asset/plugins/chart.js/Chart.min.js')?>"></script>
 
+<!-- FLOT CHARTS -->
+<script src="<?php echo base_url('asset/plugins/flot/jquery.flot.js')?>"></script>
+<!-- FLOT RESIZE PLUGIN - allows the chart to redraw when the window is resized -->
+<script src="<?php echo base_url('asset/plugins/flot/plugins/jquery.flot.resize.js')?>"></script>
+<!-- FLOT PIE PLUGIN - also used to draw donut charts -->
+<script src="<?php echo base_url('asset/plugins/flot/plugins/jquery.flot.pie.js')?>"></script>
+
 <!-- DataTables  & Plugins -->
 <script src="<?php echo base_url('asset/plugins/datatables/jquery.dataTables.min.js')?>"></script>
 <script src="<?php echo base_url('asset/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')?>"></script>
@@ -153,7 +160,7 @@
 <script src="<?php echo base_url('asset/plugins/datatables-responsive/js/responsive.bootstrap4.min.js')?>"></script>
 <script src="<?php echo base_url('asset/plugins/datatables-buttons/js/dataTables.buttons.min.js')?>"></script>
 <script src="<?php echo base_url('asset/plugins/datatables-buttons/js/buttons.bootstrap4.min.js')?>"></script>
-<script src="<?php echo base_url('asset/plugins/jszip/jszip.min.js')?>"></script>
+
 <script src="<?php echo base_url('asset/plugins/pdfmake/pdfmake.min.js')?>"></script>
 <script src="<?php echo base_url('asset/plugins/pdfmake/vfs_fonts.js')?>"></script>
 <script src="<?php echo base_url('asset/plugins/datatables-buttons/js/buttons.html5.min.js')?>"></script>
