@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="<?php echo base_url("assets/bootstrap/css/bootstrap.min.css"); ?>">
-  <link rel="stylesheet" href="<?php echo base_url("assets/bootstrap/css/bootstrap-drawer.min.css"); ?>">
+  <!-- <link rel="stylesheet" href="<?php echo base_url("assets/bootstrap/css/bootstrap-drawer.min.css"); ?>"> -->
   <link rel="icon" type="image/png" href="<?php echo base_url('asset/dist/img/rexbridge.JPG');?>" >
 <style>
       /* Set black background color, white text and some padding */
