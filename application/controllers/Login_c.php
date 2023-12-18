@@ -11,6 +11,7 @@ class login_c extends CI_Controller
         $this->load->library('user_agent');
         $this->load->library('form_validation');
         $this->load->library('datatables');
+        $this->load->library('session');
     }
 
     public function index()
