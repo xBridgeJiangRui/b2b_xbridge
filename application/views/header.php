@@ -476,6 +476,16 @@
                   </p>
                 </a>
               </li>
+
+              <li class="nav-item">
+                <a href="<?php echo site_url('Testing/testing_site') ?>" class="nav-link">
+                  <i class="nav-icon fa fa-table"></i>
+                  <p>
+                    Testing
+                    <!-- <span class="right badge badge-danger">New</span> -->
+                  </p>
+                </a>
+              </li>
               
             </ul>
           </nav>
