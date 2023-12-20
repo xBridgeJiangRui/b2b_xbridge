@@ -9,10 +9,11 @@
   }
 
 </style>
+
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <br>
-    <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal fade" id="modal-create" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
     </div>
     <!-- Filtering content -->
     <!-- Default box -->
@@ -94,6 +95,7 @@
         <div class="card-footer">
           <button id="search" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
           <button id="reset" class="btn btn-default"><i class="fas fa-sync-alt"></i> Reset</button>
+          <button id="upload" class="btn btn-default"><i class="fas fa-sync-alt"></i> Upload</button>
         </div>
         <!-- /.card-footer -->
       </div>
@@ -141,8 +143,9 @@
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
-  var ref_no = '';
+  var refno = '';
   var status = '';
   var datefrom = '';
   var dateto = '';
@@ -157,7 +160,7 @@
   var table;
   $(document).ready(function() {
     
-    main_table = function(ref_no, einvno, invno, einv_generated_date, generate_daterange_data) {
+    main_table = function(refno, einvno, invno, einv_generated_date, generate_daterange_data) {
 
       if ($.fn.DataTable.isDataTable('#main_table')) {
         $('#main_table').DataTable().destroy();
@@ -185,7 +188,7 @@
           "url": "<?php echo site_url('Testing/einvoice_list_tb') ?>",
           "type": "POST",
           "data": function(data) {
-            data.ref_no = ref_no;
+            data.refno = refno;
             data.generate_daterange_data = generate_daterange_data;
             data.einvno = einvno;
             data.invno = invno;
@@ -194,22 +197,23 @@
         },
           columns: [
             {
-              "data": "einvno", render:function(data, type ,row){
+              "data": "refno", render:function(data, type ,row){
 
                 var element = '';
                 var element1 = row['form_status'];
 
                 if((element1 == '') || (element1 == 'null') || (element1 == null))
                 {
-                    element += '<input type="checkbox" class="form-checkbox" name="trigger_check_box" id="trigger_check_box" einvno ="'+row['einvno']+'" refno ="'+row['refno']+'"/>';
+                    element += '<input type="checkbox" class="form-checkbox" name="trigger_check_box" id="trigger_check_box" refno ="'+row['refno']+'" refno ="'+row['refno']+'"/>';
                 }
                 return element;
               }
             },
-            { "data": "einvno", render: function (data, type, row) {
+            { "data": "refno", render: function (data, type, row) {
                 var buttons = '';
 
-                buttons += '<button id="einv_btn" title="TRIGGER" class="btn btn-warning btn-xs" style="margin-right: 5px;" einvno ="' +row['einvno']+ '"><i class="fa fa-edit"></i></button>';
+                buttons += '<button id="editrefno_btn" title="EDIT" class="btn btn-warning btn-xs" style="margin-right: 5px;" refno ="' +row['refno']+ '"><i class="fa fa-edit"></i></button>';
+                buttons += '<button id="deleterefno_btn" title="DELETE" class="btn btn-danger btn-xs" style="margin-right: 5px;" refno ="' +row['refno']+ '"><i class="fa fa-trash"></i></button>';
 
                 return buttons;
             }},
@@ -262,7 +266,7 @@
         });//close checkbox all set_group_table
     }
     
-    main_table(ref_no, einvno, invno, einv_generated_date, generate_daterange_data);
+    main_table(refno, einvno, invno, einv_generated_date, generate_daterange_data);
     
     $(document).on('click', '#search', function() {
         // Get the values from the filter inputs
@@ -288,37 +292,45 @@
         main_table('', '', '', '', '');
     });
 
+    $(document).on('click', '#upload', function() {
+        // Clear filter inputs
+        $('#refno_data').val('');
+        $('#einv_data').val('');
+        $('#inv_data').val('');
+        $('#einv_generated_date').val('');
+        $('#generate_daterange_data').val('');
+
+        // Call the main_table function with empty filter values
+        main_table('', '', '', '', '');
+    });
+
     $(document).on('click', '#createButton', function() {
         // Display the modal
-        $('#createModal').html(`
-        <div class="modal-dialog">
-          <div class="modal-content">
-              <div class="modal-header">
-                <h4 class="modal-title">Default Modal</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">×</span></button>
-              </div>
-              <div class="modal-body">
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label for="refno" class="col-sm-2 control-label">GRN RefNo</label>
-                  <input type="text" class="form-control" id="refno" placeholder="Grn Ref No">
-                  <label for="einvno" class="col-sm-2 control-label">E Inv No</label>
-                  <input type="text" class="form-control" id="einvno" placeholder="E Inv No">
-                  <label for="invno" class="col-sm-2 control-label">Inv No</label>
-                  <input type="text" class="form-control" id="invno" placeholder="Inv No">
-                </div>
-              </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
-                <button type="submit" id="createButtonfunc" class="btn btn-primary">Create</button>
-              </div>
-          </div>
-        </div>
-        `);
+        var modal = $("#modal-lg").modal();
 
-        $('#createModal').modal('show');
+        modal.find('.modal-title').html('Create Data');
+
+        methodd = '';
+
+        methodd +='<div class="col-md-12">';
+
+        methodd += '<div class="form-group">';
+
+        methodd += '<label for="refno" class="col-sm-2 control-label">GRN RefNo</label>';
+        methodd += '<input type="text" class="form-control" id="refno" placeholder="Grn Ref No">';
+        methodd += '<label for="einvno" class="col-sm-2 control-label">E Inv No</label>';
+        methodd += '<input type="text" class="form-control" id="einvno" placeholder="E Inv No">';
+        methodd += '<label for="invno" class="col-sm-2 control-label">Inv No</label>';
+        methodd += '<input type="text" class="form-control" id="invno" placeholder="Inv No">';
+
+        methodd += '</div>';
+
+        methodd_footer ='';
+        methodd_footer += '<button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>';
+        methodd_footer += '<button type="submit" id="createButtonfunc" class="btn btn-primary">Create</button>';
+
+        modal.find('.modal-footer').html(methodd_footer);
+        modal.find('.modal-body').html(methodd);
     });
 
     $(document).on('click', '#createButtonfunc', function() {
@@ -328,19 +340,19 @@
 
       if((refno == '') || (refno == null) || (refno == 'null'))
         {
-            alert('Invalid Process.');
+            toastr.error('Invalid Process.');
             return;
         }
 
       if((einvno == '') || (einvno == null) || (einvno == 'null'))
       {
-          alert('Invalid Process.');
+          toastr.error('Invalid Process.');
           return;
       }
 
       if((invno == '') || (invno == null) || (invno == 'null'))
       {
-          alert('Invalid Process.');
+          toastr.error('Invalid Process.');
           return;
       }
 
@@ -359,10 +371,10 @@
           success: function (data) {
               $('#createButtonfunc').prop('disabled', false).html('Save');
               var json = JSON.parse(data);
-              if (json.status) {
-                  alert("New data saved successfully.");
+              if (json.status === 'success') {
+                  toastr.success('Data added successfully!');
                   table.ajax.reload(null, false);
-                  $('#createModal').modal('hide');
+                  $('#modal-lg').modal('hide');
 
               } else {
                   alert("Failed to save new data. Please try again.");
@@ -376,7 +388,113 @@
       });
     });
 
-    
+    $(document).on('click', '#editrefno_btn', function() {
+        var refno = $(this).attr('refno');
+
+        // Display the modal
+        var modal = $("#modal-lg").modal();
+
+        modal.find('.modal-title').html('Create Data');
+
+        methodd = '';
+
+        methodd +='<div class="col-md-12">';
+
+        methodd += '<div class="form-group">';
+
+        methodd += '<label for="refno" class="col-sm-2 control-label">GRN RefNo</label>';
+        methodd += '<input type="text" class="form-control" id="refno" placeholder="Grn Ref No" value="" readonly>';
+        methodd += '<label for="einvno" class="col-sm-2 control-label">E Inv No</label>';
+        methodd += '<input type="text" class="form-control" id="einvno" placeholder="E Inv No" value="">';
+        methodd += '<label for="invno" class="col-sm-2 control-label">Inv No</label>';
+        methodd += '<input type="text" class="form-control" id="invno" placeholder="Inv No" value="">';
+
+        methodd += '</div>';
+
+        methodd_footer ='';
+        methodd_footer += '<button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>';
+        methodd_footer += '<button type="submit" id="updateButtonfunc" class="btn btn-primary">Update</button>';
+
+        modal.find('.modal-footer').html(methodd_footer);
+        modal.find('.modal-body').html(methodd);
+
+        $.ajax({
+          url: "<?php echo site_url('Testing/get_row_data'); ?>" ,
+          type: 'POST',
+          data: { refno: refno },
+          dataType: 'json',
+          success: function (data) {
+              // Populate the edit modal with user data
+              //$('#user_id').val(data.edit_user_id);
+              $('#refno').val(data.refno);
+              $('#einvno').val(data.einvno);
+              $('#invno').val(data.invno);
+          }
+        });
+    });
+
+    $(document).on('click','#updateButtonfunc',function(){
+        
+      var refno = $('#refno').val();
+      var einvno = $('#einvno').val();
+      var invno = $('#invno').val();
+
+      confirmation_modal('Are you sure want to Update Data?');
+      
+      $(document).off('click', '#confirmation_yes').on('click', '#confirmation_yes', function(){
+        // Send Ajax request to update the record
+        $.ajax({
+            url: "<?php echo site_url('Testing/update_row_data'); ?>",
+            type: 'POST',
+            data: {
+              refno:refno,
+              einvno:einvno,
+              invno:invno
+            },
+            success: function (data) {
+              var response = JSON.parse(data);
+              //console.log('Server Response:', response);  
+              if (response.status === 'success') {
+                $('#alertmodal').modal('hide');
+                toastr.success('Data updated successfully!');
+                table.ajax.reload(null, false);
+                // Hide the edit modal after DataTable reload is complete
+                $('#modal-lg').modal('hide');
+              }
+            }
+        });
+      });
+    });
+
+    $(document).on('click', '#deleterefno_btn', function () {
+      var refno = $(this).attr('refno');
+
+      confirmation_modal('Are you sure want to Delete Data?');
+      $(document).off('click', '#confirmation_yes').on('click', '#confirmation_yes', function(){
+           $.ajax({
+            url: "<?php echo site_url('Testing/delete_row_data');?>",
+            method: "POST",
+            data: { refno: refno },
+            success: function (response) {
+                var result = JSON.parse(response);
+                if (result.status) {
+                    // Success: Handle UI changes or notifications
+                    toastr.success('Data deleted successfully!');
+                    $('#alertmodal').modal('hide');
+                    table.ajax.reload(null, false);
+                } else {
+                    // Failure: Handle error notifications
+                    alert("Error");
+                    $('#alertModal').modal('hide');
+                }
+            },
+            error: function () {
+                // Error: Handle error notifications
+                alert("An error occurred while deleting the data. Please try again.");
+            }
+          });
+      });
+    });
 
   });
 

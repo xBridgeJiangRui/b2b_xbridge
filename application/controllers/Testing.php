@@ -1,4 +1,5 @@
-<?php
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+
 class Testing extends CI_Controller
 {
     public function __construct()
@@ -58,7 +59,7 @@ class Testing extends CI_Controller
         if ($this->session->userdata('loginuser') == true && $this->session->userdata('userid') != ''   && $_SESSION['user_logs'] == $this->panda->validate_login()) {
             //die;
             $doc = 'einvoice_table';
-            $ref_no = $this->input->post('ref_no');
+            $refno = $this->input->post('refno');
             $einvno = $this->input->post('einvno');
             $invno = $this->input->post('invno');
             $einv_generated_date = $this->input->post('einv_generated_date');
@@ -87,10 +88,10 @@ class Testing extends CI_Controller
                 $module_code_in = "AND a.code IN (" . $_SESSION['query_supcode'] . ") ";
             }
 
-            if ($ref_no == '') {
+            if ($refno == '') {
                 $ref_no_in = '';
             } else {
-                $ref_no_in = " AND a.RefNo LIKE '%" . $ref_no . "%' ";
+                $ref_no_in = " AND a.RefNo LIKE '%" . $refno . "%' ";
             }
 
             /*if ($status == '') {
@@ -156,8 +157,8 @@ class Testing extends CI_Controller
             //AND a.loc_group IN ($loc) -- up to production need change this
 
             // Add conditions for individual filters only if they are provided
-            if (!empty($ref_no)) {
-                $query .= " AND a.RefNo LIKE '%$ref_no%'";
+            if (!empty($refno)) {
+                $query .= " AND a.RefNo LIKE '%$refno%'";
             }
             if (!empty($einvno)) {
                 $query .= " AND a.einvno LIKE '%$einvno%'";
@@ -220,16 +221,20 @@ class Testing extends CI_Controller
     public function testCreate()
     {
         if ($this->session->userdata('loginuser') == true && $this->session->userdata('userid') != ''   && $_SESSION['user_logs'] == $this->panda->validate_login()) {
-            $ref_no = $this->input->post('ref_no');
-            $einv_guid = $this->input->post('ref_no');
+            // Get input values
+            $refno = $this->input->post('refno');
             $einvno = $this->input->post('einvno');
             $invno = $this->input->post('invno');
-            $customer_guid = $_SESSION['customer_guid'];
-            $einv_generated_date = date('Y-m-d');
+            $data = array(
+                'refno' => $refno,
+                'einv_guid' => $refno,
+                'einvno' => $einvno,
+                'invno' => $invno,
+                'customer_guid' => $_SESSION['customer_guid'],
+                'einv_generated_date' => date('Y-m-d'),
+            );
             //$type = $this->input->post('type');
             //$customer_guid = $_SESSION['customer_guid'];
-            die;
-            $data = array($ref_no,$einv_guid,$einvno,$invno,$customer_guid,$einv_generated_date);
             
             // Insert new user
             $result = $this->testing_model->insert_data($data);
@@ -248,5 +253,51 @@ class Testing extends CI_Controller
             redirect('#');
         }
     }
+
+    public function get_row_data()
+    {
+        $refno = $this->input->post('refno');
+        $data = $this->testing_model->fetch_row_data($refno);
+        
+        echo json_encode($data);
+    }
+
+    public function update_row_data()
+    {
+        $refno = $this->input->post('refno');
+
+        $editedData = array(
+            'invno' => $this->input->post('invno'),
+            'einvno' => $this->input->post('einvno'),
+            'einv_generated_date' => date('Y-m-d'),
+            // Add other fields as needed
+        );
+
+        $result = $this->testing_model->update_data($refno,$editedData);
+
+        if ($result) {
+            $response['status'] = 'success';
+        } else {
+            $response['status'] = 'error';
+        }
+
+        echo json_encode($response);
+    }
+
+    public function delete_row_data()
+    {
+        $refno = $this->input->post('refno');
+        $record = $this->testing_model->delete_row($refno);
+        if ($record) 
+        {
+            // Delete the record
+            echo json_encode(['status' => 'success', 'message' => 'Record deleted successfully']);
+        } 
+        else 
+        {
+            echo json_encode(['status' => 'error', 'message' => 'Record not found']);
+        }
+    }
+
 
 } // nothing after this

@@ -122,6 +122,56 @@
   </div>
   
 </div>
+
+<!-- modal-lg -->
+<div class="modal fade" id="modal-lg">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body table-responsive modal-control-size">
+        
+      </div>
+      <div class="modal-footer justify-content-between">
+        
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<!-- modal-alert -->
+<div class="modal fade" id="alertmodal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <center>
+          <p class="icons"></p><br>
+          <p class="msg"></p>                    
+        </center>
+      </div>
+      <div class="modal-footer button">
+
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
 <!-- ./wrapper -->
 
 <!-- jQuery -->
@@ -172,6 +222,10 @@
 
 <!-- AdminLTE for demo purposes -->
 <!-- <script src="<?php echo base_url('asset/dist/js/demo.js')?>"></script> -->
+
+<!-- Toastr -->
+<link rel="stylesheet" href="<?php echo base_url('asset/plugins/toastr/toastr.min.css')?>">
+<script src="<?php echo base_url('asset/plugins/toastr/toastr.min.js')?>"></script>
 
 </body>
 </html>
@@ -244,6 +298,20 @@ function closeForm()
   {
     document.getElementById("chat_box").style.display = "none";
   }
+}
+
+function loadingButton($class,$id)
+{
+  $value = $class+$id;
+  $($value).prop('disabled', true);
+  // $($value).text('Loading...');
+}
+
+function resetButton($class,$id)
+{
+  $value = $class+$id;
+  $($value).prop('disabled', false);
+  // $($value).text($get_attr_value);
 }
 
 </script>
@@ -592,6 +660,19 @@ $(document).ready(function() {
     $(this).closest('div.chat-popup').hide();
 
   });//close cancel_button
+
+//toastr setting design
+toastr.options = {
+  timeOut: 0, // Set timeOut to 0 to make toastr sticky
+  extendedTimeOut: 0, // Set extendedTimeOut to 0 to make toastr sticky
+  tapToDismiss: false, // Disable click to dismiss
+  closeButton: true, // Show close button
+  closeHtml: '<button>&times;</button>', // Customize close button HTML
+  positionClass: 'toast-top-center', // Set the position to top-right
+  preventDuplicates: true, // Prevent duplicate toasts
+  
+};
+
 
 });
 </script>
