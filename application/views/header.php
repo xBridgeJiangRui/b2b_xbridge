@@ -114,6 +114,8 @@
     body {
       width: 100%;
       height: 100%;
+      background:none !important;
+      background-image:none !important;
     }
 
     .btn-group-fab {
@@ -285,6 +287,20 @@
     .tooltip9:hover .tooltiptext {
       visibility: visible;
     }
+
+    /* -- Force the design follow below (SVG Problem) --*/
+    .was-validated .custom-select:invalid, .custom-select.is-invalid {
+      background:none !important;
+    }
+
+    .was-validated .custom-select:valid, .custom-select.is-valid {
+      background:none !important;
+    }
+
+    .custom-select {
+      background:none !important;
+    }
+
   </style>
 
   <script type="text/javascript">
@@ -316,7 +332,7 @@
           ?>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-          <a href="#" class="nav-link">Contact</a>
+          <a href="#" id="contactus" class="nav-link">Contact</a>
         </li>
       </ul>
 
@@ -486,6 +502,16 @@
                   </p>
                 </a>
               </li>
+
+              <li class="nav-item">
+                <a href="<?php echo site_url('Form/form_site') ?>" class="nav-link">
+                  <i class="nav-icon fas fa-edit"></i>
+                  <p>
+                    Form
+                    <!-- <span class="right badge badge-danger">New</span> -->
+                  </p>
+                </a>
+              </li>
               
             </ul>
           </nav>
@@ -519,3 +545,28 @@
     ?>
 
     <div class="se-pre-con"></div>
+
+    <script>
+
+  $(document).ready(function() {
+
+    $(document).on('click', '#contactus', function() {
+        // Display the modal
+        var modal = $("#large-modal").modal();
+
+        modal.find('.modal-title').html('Contact Us');
+
+        methodd = '';
+
+        methodd +='<div class="col-md-12">';
+
+        methodd += '<div class="form-group">';
+
+        methodd += '</div>';
+        modal.find('.modal-body').html(methodd);
+    });
+
+  });
+
+</script>
+

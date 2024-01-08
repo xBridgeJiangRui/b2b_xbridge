@@ -71,6 +71,30 @@
               <!-- /.card-body -->
             </div>
             <!-- /.card -->
+
+            <!-- BAR CHART -->
+            <div class="card card-success">
+              <div class="card-header">
+                <h3 class="card-title">Bar Chart <span class="pill_button"> <?php echo $this_year; ?></h3>
+
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart">
+                  <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+
           </div>
           <!-- /.col (RIGHT) -->
         </div>
@@ -270,6 +294,91 @@ $(document).ready(function() {
 
   var current_ctx = document.getElementById("lineChart").getContext("2d");
   window.myLine = new Chart(current_ctx, current_config);
+
+  //-------------
+  //- BAR CHART -
+  //-------------
+  var e_document_labels = [
+    <?php foreach ($get_einvoice_year_query as $key) {
+      echo " ' ". $key['month_code']." ' , ";
+    } ?>
+  ];
+
+  var current_config = {
+    type: 'bar', // Change the chart type to 'bar'
+    data: {
+      labels: e_document_labels,
+      datasets: [
+        {
+          label: "E-Invoice",
+          backgroundColor     : '#00a65a', // Set the background color for the first dataset
+          borderColor         : '#00a65a',
+          data: [
+            <?php foreach ($get_einvoice_year_query as $key) {
+              echo $key['count_doc'].',';
+            } ?>
+          ],
+          fill: false, // Set fill to false for bar chart
+        },
+        {
+          label: "E-CN",
+          backgroundColor     : '#f56954', // Set the background color for the second dataset
+          borderColor: '#f56954',
+          data: [
+            <?php foreach ($get_ecn_year_query as $key) {
+              echo $key['count_doc'].',';
+            } ?>
+          ],
+          fill: false,
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      title: {
+        display: false,
+      },
+      tooltips: {
+        mode: 'index',
+        intersect: false,
+        callbacks: {
+          label: function(tooltipItem, data) {
+            var datasetLabel = data.datasets[tooltipItem.datasetIndex].label;
+            var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+            return datasetLabel + ': ' + value;
+          }
+        }
+      },
+      scales: {
+        xAxes: [{
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Month'
+          }
+        }],
+        yAxes: [{
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Document'
+          },
+          ticks: {
+            beginAtZero: true,
+            userCallback: function(label, index, labels) {
+              if (Math.floor(label) === label) {
+                return label;
+              }
+            }
+          }
+        }]
+      }
+    }
+  };
+
+  var current_ctx = document.getElementById("barChart").getContext("2d");
+  window.myBar = new Chart(current_ctx, current_config);
+
 
 });
 </script>

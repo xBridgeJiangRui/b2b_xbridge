@@ -12,7 +12,6 @@
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-    <br>
     <div class="modal fade" id="modal-create" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
     </div>
     <!-- Filtering content -->
@@ -95,7 +94,7 @@
         <div class="card-footer">
           <button id="search" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
           <button id="reset" class="btn btn-default"><i class="fas fa-sync-alt"></i> Reset</button>
-          <button id="upload" class="btn btn-default"><i class="fas fa-sync-alt"></i> Upload</button>
+          <button id="upload" class="btn btn-default"><i class="fas fa-upload"></i> Upload</button>
         </div>
         <!-- /.card-footer -->
       </div>
@@ -112,7 +111,7 @@
         <div class="card-header">
           <div class="d-flex justify-content-between align-items-center">
               <h3 class="card-title">E-Invoice List</h3>
-              <button id="createButton" class="btn btn-success"><i class="fas fa-plus"></i> Create</button>
+              <button id="createButton" class="btn btn-success btn-xs"><i class="fas fa-plus"></i> Create</button>
             </div>
           </div>
           <div class="card-body">
@@ -306,24 +305,20 @@
 
     $(document).on('click', '#createButton', function() {
         // Display the modal
-        var modal = $("#modal-lg").modal();
+        var modal = $("#large-modal").modal();
 
         modal.find('.modal-title').html('Create Data');
 
         methodd = '';
 
-        methodd +='<div class="col-md-12">';
-
-        methodd += '<div class="form-group">';
-
-        methodd += '<label for="refno" class="col-sm-2 control-label">GRN RefNo</label>';
-        methodd += '<input type="text" class="form-control" id="refno" placeholder="Grn Ref No">';
-        methodd += '<label for="einvno" class="col-sm-2 control-label">E Inv No</label>';
-        methodd += '<input type="text" class="form-control" id="einvno" placeholder="E Inv No">';
-        methodd += '<label for="invno" class="col-sm-2 control-label">Inv No</label>';
-        methodd += '<input type="text" class="form-control" id="invno" placeholder="Inv No">';
-
-        methodd += '</div>';
+        methodd +='<form><div class="card-body">';
+        methodd += '<div class="form-group"><label for="refno">GRN RefNo</label>';
+        methodd += '<input type="text" class="form-control" id="refno" placeholder="Grn Ref No"></div>';
+        methodd += '<div class="form-group"><label for="einvno">E Inv No</label>';
+        methodd += '<input type="text" class="form-control" id="einvno" placeholder="E Inv No"></div>';
+        methodd += '<div class="form-group"><label for="invno">Inv No</label>';
+        methodd += '<input type="text" class="form-control" id="invno" placeholder="Inv No"></div>';
+        methodd += '</div></form>';
 
         methodd_footer ='';
         methodd_footer += '<button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>';
@@ -374,7 +369,7 @@
               if (json.status === 'success') {
                   toastr.success('Data added successfully!');
                   table.ajax.reload(null, false);
-                  $('#modal-lg').modal('hide');
+                  $('#large-modal').modal('hide');
 
               } else {
                   alert("Failed to save new data. Please try again.");
@@ -391,25 +386,20 @@
     $(document).on('click', '#editrefno_btn', function() {
         var refno = $(this).attr('refno');
 
-        // Display the modal
-        var modal = $("#modal-lg").modal();
+        var modal = $("#large-modal").modal();
 
-        modal.find('.modal-title').html('Create Data');
+        modal.find('.modal-title').html('Update Data');
 
         methodd = '';
 
-        methodd +='<div class="col-md-12">';
-
-        methodd += '<div class="form-group">';
-
-        methodd += '<label for="refno" class="col-sm-2 control-label">GRN RefNo</label>';
-        methodd += '<input type="text" class="form-control" id="refno" placeholder="Grn Ref No" value="" readonly>';
-        methodd += '<label for="einvno" class="col-sm-2 control-label">E Inv No</label>';
-        methodd += '<input type="text" class="form-control" id="einvno" placeholder="E Inv No" value="">';
-        methodd += '<label for="invno" class="col-sm-2 control-label">Inv No</label>';
-        methodd += '<input type="text" class="form-control" id="invno" placeholder="Inv No" value="">';
-
-        methodd += '</div>';
+        methodd +='<form><div class="card-body">';
+        methodd += '<div class="form-group"><label for="refno">GRN RefNo</label>';
+        methodd += '<input type="text" class="form-control" id="refno" placeholder="Grn Ref No" value="" readonly></div>';
+        methodd += '<div class="form-group"><label for="einvno">E Inv No</label>';
+        methodd += '<input type="text" class="form-control" id="einvno" placeholder="E Inv No" value=""></div>';
+        methodd += '<div class="form-group"><label for="invno">Inv No</label>';
+        methodd += '<input type="text" class="form-control" id="invno" placeholder="Inv No" value=""></div>';
+        methodd += '</div></form>';
 
         methodd_footer ='';
         methodd_footer += '<button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>';
@@ -459,7 +449,7 @@
                 toastr.success('Data updated successfully!');
                 table.ajax.reload(null, false);
                 // Hide the edit modal after DataTable reload is complete
-                $('#modal-lg').modal('hide');
+                $('#large-modal').modal('hide');
               }
             }
         });
